@@ -4,6 +4,7 @@ import java.util.logging.Level;
 
 
 public class OddEvenPrinterMultiThreaded {
+    // Logger instance for logging events in the multi-threaded class
     private static final Logger logger = Logger.getLogger(OddEvenPrinterMultiThreaded.class.getName());
 
     private int number;
@@ -16,35 +17,40 @@ public class OddEvenPrinterMultiThreaded {
         this.number = 1;
     }
 
+    // Method for printing odd numbers
     public synchronized void printOddNumber() throws InterruptedException {
         logger.log(Level.INFO, "Starting new thread to print odd numbers, Thread id -> {0}", Thread.currentThread().threadId());
         while (number < this.upperLimit){
             while (!oddTurn){
-                wait();
+                wait();  // Wait if it's not odd's turn
             }
 
             logger.log(Level.INFO, "Odd : {0}",getNumber());
             incrementNumber();
-            oddTurn = false;
+            setTurn(false);// Now it's even's turn
 
-            notify();
+            notify(); // Notify waiting thread
         }
         logger.log(Level.INFO, "Thread id -> {0} ended ", Thread.currentThread().threadId());
     }
 
-
+    // Method for printing even numbers
     public synchronized void printEvenNumber() throws InterruptedException {
         logger.log(Level.INFO, "Starting new thread to print even numbers, Thread id -> {0}", Thread.currentThread().threadId());
         while (number < this.upperLimit){
             while (oddTurn){
-                wait();
+                wait(); // Wait if it's not even's turn
             }
             logger.log(Level.INFO, "Odd : {0}",getNumber());
             incrementNumber();
-            oddTurn = true;
-            notify();
+            setTurn(true);// Now it's odd's turn
+            notify();  // Notify waiting thread
         }
         logger.log(Level.INFO, "Thread id -> {0} ended ", Thread.currentThread().threadId());
+    }
+
+    private void setTurn(boolean oddTurn){
+        this.oddTurn = oddTurn;
     }
 
     private void incrementNumber(){
